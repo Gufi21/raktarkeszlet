@@ -18,6 +18,21 @@ class Brand
      */
     private int $qualityCategory;
 
+    /**
+     * Márka objektum létrehozása
+     *
+     * @param string $name Márkanév
+     * @param int $qualityCategory Minőségkategória
+     * @return Brand
+     */
+    public static function create(string $name, int $qualityCategory): Brand
+    {
+        $brand = new Brand();
+        $brand->setName($name);
+        $brand->setQualityCategory($qualityCategory);
+        return $brand;
+    }
+
     /** @return string */
     public function getName(): string
     {

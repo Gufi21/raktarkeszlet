@@ -30,6 +30,23 @@ class Warehouse
     /** @var Stock[] */
     private array $stocks = [];
 
+    /**
+     * Raktár objektum létrehozása
+     *
+     * @param string $name Megnevezés
+     * @param string $address Cím
+     * @param int $capacity Kapacitás
+     * @return Warehouse
+     */
+    public static function create(string $name, string $address, int $capacity): Warehouse
+    {
+        $warehouse = new Warehouse();
+        $warehouse->setName($name);
+        $warehouse->setAddress($address);
+        $warehouse->setCapacity($capacity);
+        return $warehouse;
+    }
+
     /** @return string */
     public function getName(): string
     {
@@ -115,7 +132,7 @@ class Warehouse
         $updated = false;
 
         for ($i = 0; !$updated && $i < $stockCount; $i++) {
-            if ($this->stocks[$i]->getProduct()->getName() === $stock->getProduct()->getName()) {
+            if ($this->stocks[$i]->getProduct()->getItemNumber() === $stock->getProduct()->getItemNumber()) {
                 $this->stocks[$i]->addPiece($stock->getPiece());
                 $updated = true;
             }
@@ -131,23 +148,21 @@ class Warehouse
      *
      * Amennyiben nincs a raktárban a keresett termékből, akkor nem adunk vissza semmit.
      *
-     * @param string $productName Termék neve
+     * @param string $itemNumber Cikkszám
      * @param int $piece Darabszám
      * @return Stock|null
      */
-    public function takeStock(string $productName, int $piece): ?Stock
+    public function takeStock(string $itemNumber, int $piece): ?Stock
     {
         /** @var Stock|null $stock */
         $stock = null;
         $stockCount = count($this->stocks);
 
         for ($i = 0; $stock == null && $i < $stockCount; $i++) {
-            if ($this->stocks[$i]->getProduct()->getName() === $productName) {
+            if ($this->stocks[$i]->getProduct()->getItemNumber() === $itemNumber) {
                 if ($this->stocks[$i]->getPiece() > $piece) {
                     // ha több van raktáron, mint amennyi nekünk kell
-                    $stock = new Stock();
-                    $stock->setProduct($this->stocks[$i]->getProduct());
-                    $stock->setPiece($piece);
+                    $stock = Stock::create($this->stocks[$i]->getProduct(), $piece);
 
                     $this->stocks[$i]->takePiece($piece);
                 } else {

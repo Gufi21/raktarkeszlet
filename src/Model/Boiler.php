@@ -22,6 +22,29 @@ class Boiler extends Product
      */
     private int $performance;
 
+    /**
+     * Boiler termék objektum létrehozása
+     *
+     * @param string $itemNumber Cikkszám
+     * @param string $name Termék neve
+     * @param int $price Ár
+     * @param Brand $brand Márka
+     * @param int $cubicCapacity Űrtartalom
+     * @param int $performance Teljesítmény
+     * @return Boiler
+     */
+    public static function create(string $itemNumber, string $name, int $price, Brand $brand, int $cubicCapacity, int $performance): Boiler
+    {
+        $boiler = new Boiler();
+        $boiler->setItemNumber($itemNumber);
+        $boiler->setName($name);
+        $boiler->setPrice($price);
+        $boiler->setBrand($brand);
+        $boiler->setCubicCapacity($cubicCapacity);
+        $boiler->setPerformance($performance);
+        return $boiler;
+    }
+
     /** @return int */
     public function getCubicCapacity(): int
     {

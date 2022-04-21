@@ -38,6 +38,35 @@ class LawnMower extends Product
      */
     private int $weight;
 
+    /**
+     * Fűnyíró termék objektum létrehozása
+     *
+     * @param string $itemNumber Cikkszám
+     * @param string $name Termék neve
+     * @param int $price Ár
+     * @param Brand $brand Márka
+     * @param int $type Fűnyíró típusa
+     * @param int $cutWidth Vágószélesség
+     * @param int $weight Súly
+     * @param int|null $grassCatcherCapacity Fűgyűjtő űrtartalma
+     * @return LawnMower
+     */
+    public static function create(
+        string $itemNumber, string $name, int $price, Brand $brand,
+        int $type, int $cutWidth, int $weight, ?int $grassCatcherCapacity
+    ): LawnMower {
+        $lawnMower = new LawnMower();
+        $lawnMower->setItemNumber($itemNumber);
+        $lawnMower->setName($name);
+        $lawnMower->setPrice($price);
+        $lawnMower->setBrand($brand);
+        $lawnMower->setType($type);
+        $lawnMower->setCutWidth($cutWidth);
+        $lawnMower->setWeight($weight);
+        $lawnMower->setGrassCatcherCapacity($grassCatcherCapacity);
+        return $lawnMower;
+    }
+
     /** @return int */
     public function getType(): int
     {

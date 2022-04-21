@@ -1,7 +1,18 @@
 {
+    "require": {
+        "php": "7.4.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
     "autoload": {
         "psr-4": {
             "Warehouse\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Warehouse\\Tests\\": "tests/"
         }
     }
 }

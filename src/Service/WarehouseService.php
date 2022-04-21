@@ -5,6 +5,7 @@ namespace Warehouse\Service;
 use Warehouse\Model\Product;
 use Warehouse\Model\Stock;
 use Warehouse\Model\Warehouse;
+use Warehouse\Service\Exception\WarehouseException;
 
 class WarehouseService implements WarehouseServiceInterface
 {
@@ -21,45 +22,70 @@ class WarehouseService implements WarehouseServiceInterface
      * @param string $name A raktár neve.
      * @param string $address A raktár címe.
      * @param int $capacity A raktár kapacitása.
+     * @return Warehouse
      */
-    public function createWarehouse(string $name, string $address, int $capacity): void
+    public function createWarehouse(string $name, string $address, int $capacity): Warehouse
     {
-        $warehouse = new Warehouse();
-        $warehouse->setName($name);
-        $warehouse->setAddress($address);
-        $warehouse->setCapacity($capacity);
-
+        $warehouse = Warehouse::create($name, $address, $capacity);
         $this->warehouses[] = $warehouse;
+        return $warehouse;
     }
 
     /**
-     * Raktárkészlet létrehozása
+     * Összkapacitás
      *
-     * Egy termék egy raktárban lévő készlete.
-     *
-     * @param Product $product Termék
-     * @param int $piece Darabszám
-     * @return Stock
+     * @return int
      */
-    public function createStock(Product $product, int $piece): Stock
+    public function getSumCapacity(): int
     {
-        $stock = new Stock();
-        $stock->setProduct($product);
-        $stock->setPiece($piece);
-        return $stock;
-    }
-
-    /**
-     * A raktárak tartalmának kiírása.
-     */
-    public function printWarehouses(): void
-    {
+        $sumCapacity = 0;
         foreach ($this->warehouses as $warehouse) {
-            echo $warehouse->getName() . " (" . $warehouse->getAddress() . ")<br>";
+            $sumCapacity += $warehouse->getCapacity();
+        }
+        return $sumCapacity;
+    }
+
+    /**
+     * Szabad kapacitás
+     *
+     * @return int
+     */
+    public function getFreeCapacity(): int
+    {
+        $freeCapacity = 0;
+        foreach ($this->warehouses as $warehouse) {
+            $freeCapacity += $warehouse->getFreeCapacity();
+        }
+        return $freeCapacity;
+    }
+
+    /**
+     * A raktárak tartalmának kiírása HTML outputra.
+     */
+    public function printWarehousesToHtml(): void
+    {
+        echo "<br>";
+        foreach ($this->warehouses as $warehouse) {
+            echo "<span>" . $warehouse->getName() . " (" . $warehouse->getAddress() . ")</span><br>";
             foreach ($warehouse->getStocks() as $stock) {
-                echo $stock->getProduct()->getName() . " (Cikkszám: " . $stock->getProduct()->getItemNumber() . ") x" . $stock->getPiece() . "<br>";
+                echo "<span>" . $stock->getProduct()->getName() . " (Cikkszám: " . $stock->getProduct()->getItemNumber() . ") x" . $stock->getPiece() . "</span><br>";
             }
             echo "<br><br>";
+        }
+    }
+
+    /**
+     * A raktárak tartalmának kiírása console outputra.
+     */
+    public function printWarehousesToConsole(): void
+    {
+        echo "\n";
+        foreach ($this->warehouses as $warehouse) {
+            echo $warehouse->getName() . " (" . $warehouse->getAddress() . ")\n";
+            foreach ($warehouse->getStocks() as $stock) {
+                echo $stock->getProduct()->getName() . " (Cikkszám: " . $stock->getProduct()->getItemNumber() . ") x" . $stock->getPiece() . "\n";
+            }
+            echo "\n\n";
         }
     }
 
@@ -82,7 +108,7 @@ class WarehouseService implements WarehouseServiceInterface
 
             if ($freeCapacity > 0) {
                 $useCapacity = min($freeCapacity, $needCapacity);
-                $stocks[$ind] = $this->createStock($product, $useCapacity);
+                $stocks[$ind] = Stock::create($product, $useCapacity);
                 $needCapacity -= $useCapacity;
             }
         }
@@ -101,12 +127,12 @@ class WarehouseService implements WarehouseServiceInterface
      *
      * Visszaadjuk az összevont raktárkészletet.
      *
-     * @param string $productName Termék neve
+     * @param string $itemNumber Cikkszám
      * @param int $piece Darabszám
      * @return Stock
      * @throws WarehouseException Nincs raktáron.
      */
-    public function takeProducts(string $productName, int $piece): Stock
+    public function takeProducts(string $itemNumber, int $piece): Stock
     {
         /**  @var Stock[] $stocks */
         $stocks = [];
@@ -114,7 +140,7 @@ class WarehouseService implements WarehouseServiceInterface
         $warehouseCount = count($this->warehouses);
 
         for ($ind = 0; $needPiece > 0 && $ind < $warehouseCount; $ind++) {
-            $stock = $this->warehouses[$ind]->takeStock($productName, $needPiece);
+            $stock = $this->warehouses[$ind]->takeStock($itemNumber, $needPiece);
             if ($stock != null) {
                 $needPiece -= $stock->getPiece();
                 $stocks[] = $stock;
@@ -132,6 +158,6 @@ class WarehouseService implements WarehouseServiceInterface
             throw new WarehouseException(WarehouseException::OUT_OF_STOCK, "Nincs raktáron a szükséges mennyiség. Hiányzik: " . $needPiece);
         }
 
-        return $this->createStock($stocks[0]->getProduct(), $piece);
+        return Stock::create($stocks[0]->getProduct(), $piece);
     }
 }

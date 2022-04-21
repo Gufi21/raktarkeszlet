@@ -21,6 +21,8 @@ abstract class Product
     /**
      * Ár
      *
+     * Az érték forintban értendő.
+     *
      * @var int
      */
     protected int $price;

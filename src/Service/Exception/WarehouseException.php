@@ -1,6 +1,6 @@
 <?php
 
-namespace Warehouse\Service;
+namespace Warehouse\Service\Exception;
 
 use Exception;
 use Throwable;

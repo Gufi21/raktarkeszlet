@@ -4,6 +4,8 @@ namespace Warehouse\Service;
 
 use Warehouse\Model\Product;
 use Warehouse\Model\Stock;
+use Warehouse\Model\Warehouse;
+use Warehouse\Service\Exception\WarehouseException;
 
 interface WarehouseServiceInterface
 {
@@ -13,24 +15,33 @@ interface WarehouseServiceInterface
      * @param string $name A raktár neve.
      * @param string $address A raktár címe.
      * @param int $capacity A raktár kapacitása.
+     * @return Warehouse
      */
-    public function createWarehouse(string $name, string $address, int $capacity): void;
+    public function createWarehouse(string $name, string $address, int $capacity): Warehouse;
 
     /**
-     * Raktárkészlet létrehozása
+     * Összkapacitás
      *
-     * Egy termék egy raktárban lévő készlete.
-     *
-     * @param Product $product Termék
-     * @param int $piece Darabszám
-     * @return Stock
+     * @return int
      */
-    public function createStock(Product $product, int $piece): Stock;
+    public function getSumCapacity(): int;
 
     /**
-     * A raktárak tartalmának kiírása.
+     * Szabad kapacitás
+     *
+     * @return int
      */
-    public function printWarehouses(): void;
+    public function getFreeCapacity(): int;
+
+    /**
+     * A raktárak tartalmának kiírása HTML outputra.
+     */
+    public function printWarehousesToHtml(): void;
+
+    /**
+     * A raktárak tartalmának kiírása console outputra.
+     */
+    public function printWarehousesToConsole(): void;
 
     /**
      * Termék raktárba helyezése.
@@ -44,10 +55,10 @@ interface WarehouseServiceInterface
     /**
      * Termék kivétele a raktárakból.
      *
-     * @param string $productName Termék neve
+     * @param string $itemNumber Cikkszám
      * @param int $piece Darabszám
      * @return Stock
      * @throws WarehouseException Nincs raktáron.
      */
-    public function takeProducts(string $productName, int $piece): Stock;
+    public function takeProducts(string $itemNumber, int $piece): Stock;
 }

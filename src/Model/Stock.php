@@ -18,6 +18,21 @@ class Stock
      */
     private int $piece;
 
+    /**
+     * Raktárkészlet objektum létrehozása
+     *
+     * @param Product $product Termék
+     * @param int $piece Darabszám
+     * @return Stock
+     */
+    public static function create(Product $product, int $piece): Stock
+    {
+        $stock = new Stock();
+        $stock->setProduct($product);
+        $stock->setPiece($piece);
+        return $stock;
+    }
+
     /** @return Product */
     public function getProduct(): Product
     {
